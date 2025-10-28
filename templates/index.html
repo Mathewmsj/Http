@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coursera Flask Demo</title>
+    <!-- 使用 Flask 的 url_for 函数加载静态 CSS 文件 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="icon">
+            <!-- 使用 Flask 的 url_for 函数加载静态图片 -->
+            <img src="{{ url_for('static', filename='images/soccer-ball.png') }}" alt="Soccer Ball" class="soccer-icon">
+        </div>
+        <h1>Coursera Flask Demo</h1>
+        <p>欢迎来到足球比分查询系统！<br>点击下方按钮查看实时足球比赛分数。</p>
+        <a href="/scores" class="btn">View scores!</a>
+    </div>
+</body>
+</html>
+

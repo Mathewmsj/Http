@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="60" height="60">
+  <!-- 奖杯主体 -->
+  <path d="M 256 80 L 180 120 L 200 320 L 312 320 L 332 120 Z" 
+        fill="#FFD700" stroke="#DAA520" stroke-width="4"/>
+  
+  <!-- 奖杯把手 - 左 -->
+  <path d="M 180 120 Q 120 140 120 200 Q 120 240 160 250 L 180 200 Z" 
+        fill="#FFD700" stroke="#DAA520" stroke-width="4"/>
+  
+  <!-- 奖杯把手 - 右 -->
+  <path d="M 332 120 Q 392 140 392 200 Q 392 240 352 250 L 332 200 Z" 
+        fill="#FFD700" stroke="#DAA520" stroke-width="4"/>
+  
+  <!-- 奖杯底座 -->
+  <rect x="220" y="320" width="72" height="40" fill="#FFD700" stroke="#DAA520" stroke-width="4"/>
+  <rect x="200" y="360" width="112" height="30" rx="5" fill="#FFD700" stroke="#DAA520" stroke-width="4"/>
+  <rect x="180" y="390" width="152" height="20" rx="3" fill="#FFD700" stroke="#DAA520" stroke-width="4"/>
+  
+  <!-- 高光效果 -->
+  <ellipse cx="240" cy="180" rx="30" ry="50" fill="#FFFFFF" opacity="0.3"/>
+</svg>
+

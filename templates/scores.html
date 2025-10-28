@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Soccer Scores</title>
+    <!-- 使用 Flask 的 url_for 函数加载静态 CSS 文件 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scores.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <img src="{{ url_for('static', filename='images/trophy.png') }}" alt="Trophy" class="trophy-icon">
+                Live Soccer Scores
+            </h1>
+            <a href="/" class="back-link">← 返回主页</a>
+        </header>
+        
+        {% if scores and scores|length > 0 %}
+        <div class="scores-grid">
+            {% for match in scores %}
+            <div class="match-card">
+                <div class="competition">{{ match.competition }}</div>
+                <div class="match-info">
+                    <div class="team">{{ match.home_team }}</div>
+                    <div class="score">{{ match.home_score if match.home_score != None else '-' }}</div>
+                </div>
+                <div class="match-info">
+                    <div class="team">{{ match.away_team }}</div>
+                    <div class="score">{{ match.away_score if match.away_score != None else '-' }}</div>
+                </div>
+                <span class="status {% if match.status == 'FINISHED' %}finished{% elif match.status == 'IN_PLAY' %}live{% else %}scheduled{% endif %}">
+                    {% if match.status == 'FINISHED' %}
+                        已结束
+                    {% elif match.status == 'IN_PLAY' %}
+                        直播中
+                    {% elif match.status == 'SCHEDULED' %}
+                        未开始
+                    {% else %}
+                        {{ match.status }}
+                    {% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-matches">
+            <img src="{{ url_for('static', filename='images/no-data.png') }}" alt="No Data" class="no-data-icon">
+            <h2>暂无比赛数据</h2>
+            <p>当前没有可显示的比赛信息。<br>这可能是因为：<br>
+            1. 需要在 app.py 中配置有效的 API 密钥<br>
+            2. API 请求失败<br>
+            3. 当前时段没有进行中的比赛</p>
+            <a href="/scores" class="refresh-btn">🔄 刷新数据</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+
