@@ -2,52 +2,61 @@
 Flask 应用 - AJAX 学生列表
 功能：提供学生数据 API，前端通过 AJAX 动态加载
 """
-from flask import Flask, jsonify, render_template
 import os
+import sys
+
+# 计算项目根目录
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# 避免同目录下的 myhttp.py 影响标准库 http 包（Flask -> Werkzeug 依赖 http.server）
+if '' in sys.path:
+    try:
+        sys.path.remove('')
+    except ValueError:
+        pass
+if BASE_DIR in sys.path:
+    try:
+        sys.path.remove(BASE_DIR)
+    except ValueError:
+        pass
+
+from flask import Flask, jsonify, render_template
 
 app = Flask(__name__)
 
-# 学生数据（模拟数据库）
+# 学生数据（模拟数据库）- 使用你自己的数据
 students = [
     {
         "id": 1,
-        "name": "张三",
-        "age": 20,
-        "major": "计算机科学",
-        "grade": "大二",
-        "email": "zhangsan@example.com"
+        "name": "王易宁",
+        "age": 17,
+        "major": "音乐（乐队）",
+        "grade": "高中",
+        "email": "wangyining@school.com"
     },
     {
         "id": 2,
-        "name": "李四",
-        "age": 21,
-        "major": "软件工程",
-        "grade": "大三",
-        "email": "lisi@example.com"
+        "name": "张翼",
+        "age": 17,
+        "major": "计算机科学",
+        "grade": "高中",
+        "email": "zhangyi@school.com"
     },
     {
         "id": 3,
-        "name": "王五",
-        "age": 19,
-        "major": "数据科学",
-        "grade": "大一",
-        "email": "wangwu@example.com"
+        "name": "灯",
+        "age": 17,
+        "major": "艺术设计",
+        "grade": "高中",
+        "email": "deng@school.com"
     },
     {
         "id": 4,
-        "name": "赵六",
-        "age": 22,
-        "major": "人工智能",
-        "grade": "大四",
-        "email": "zhaoliu@example.com"
-    },
-    {
-        "id": 5,
-        "name": "孙七",
-        "age": 20,
-        "major": "网络安全",
-        "grade": "大二",
-        "email": "sunqi@example.com"
+        "name": "木桨",
+        "age": 17,
+        "major": "体育运动",
+        "grade": "高中",
+        "email": "mujiang@school.com"
     }
 ]
 
