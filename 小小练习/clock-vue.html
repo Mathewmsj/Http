@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue计时器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .clock {
+            font-size: 72px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+        }
+        
+        .date {
+            font-size: 24px;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+    <!-- 使用CDN引入Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <h1>当前时间</h1>
+            <div class="clock">{{ time }}</div>
+            <div class="date">{{ date }}</div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    time: '00:00:00',
+                    date: '2025-01-01',
+                    timer: null
+                };
+            },
+            mounted() {
+                // 立即更新一次
+                this.updateTime();
+                
+                // 每秒更新一次
+                this.timer = setInterval(() => {
+                    this.updateTime();
+                }, 1000);
+            },
+            beforeUnmount() {
+                // 清理定时器
+                if (this.timer) {
+                    clearInterval(this.timer);
+                }
+            },
+            methods: {
+                updateTime() {
+                    const now = new Date();
+                    
+                    // 格式化时间 HH:MM:SS
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    const seconds = String(now.getSeconds()).padStart(2, '0');
+                    this.time = `${hours}:${minutes}:${seconds}`;
+                    
+                    // 格式化日期 YYYY-MM-DD
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    this.date = `${year}-${month}-${day}`;
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
+
