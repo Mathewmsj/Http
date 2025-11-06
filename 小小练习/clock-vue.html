@@ -73,18 +73,13 @@
                 };
             },
             mounted() {
-                // 立即更新一次
+                // 立即更新一次并开始递归调用
                 this.updateTime();
-                
-                // 每秒更新一次
-                this.timer = setInterval(() => {
-                    this.updateTime();
-                }, 1000);
             },
             beforeUnmount() {
                 // 清理定时器
                 if (this.timer) {
-                    clearInterval(this.timer);
+                    clearTimeout(this.timer);
                 }
             },
             methods: {
@@ -102,6 +97,11 @@
                     const month = String(now.getMonth() + 1).padStart(2, '0');
                     const day = String(now.getDate()).padStart(2, '0');
                     this.date = `${year}-${month}-${day}`;
+                    
+                    // 使用 setTimeout 递归调用，每秒更新一次
+                    this.timer = setTimeout(() => {
+                        this.updateTime();
+                    }, 1000);
                 }
             }
         }).mount('#app');

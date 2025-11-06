@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>秒表（停表）</title>
+    <!-- 使用CDN引入Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        @keyframes glow {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(64, 224, 208, 0.5),
+                           0 0 40px rgba(64, 224, 208, 0.3),
+                           0 0 60px rgba(64, 224, 208, 0.2);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(64, 224, 208, 0.8),
+                           0 0 60px rgba(64, 224, 208, 0.5),
+                           0 0 90px rgba(64, 224, 208, 0.3);
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #0a0a0a, #1a1a2e, #16213e, #0f3460);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(64, 224, 208, 0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 20, 147, 0.1) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite reverse;
+            pointer-events: none;
+        }
+        
+        .container {
+            background: transparent;
+            padding: 50px 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.8s ease-out;
+        }
+        
+        .display {
+            font-size: clamp(48px, 8vw, 96px);
+            font-weight: 300;
+            background: linear-gradient(135deg, #40e0d0, #ff1493, #9370db);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 40px 0;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            letter-spacing: clamp(2px, 0.5vw, 4px);
+            line-height: 1.2;
+            animation: gradient 3s ease infinite, pulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(64, 224, 208, 0.6))
+                    drop-shadow(0 0 40px rgba(255, 20, 147, 0.4));
+            position: relative;
+            white-space: nowrap;
+            overflow: visible;
+            word-break: keep-all;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 16px 36px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+            min-width: 110px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        button span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #00f5ff, #00d4ff);
+            box-shadow: 0 4px 20px rgba(0, 245, 255, 0.4);
+        }
+        
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 245, 255, 0.6);
+        }
+        
+        .pause-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        .pause-btn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(255, 107, 107, 0.6);
+        }
+        
+        .lap-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            box-shadow: 0 4px 20px rgba(78, 205, 196, 0.4);
+        }
+        
+        .lap-btn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.6);
+        }
+        
+        .reset-btn {
+            background: linear-gradient(135deg, #ff1493, #ff69b4);
+            box-shadow: 0 4px 20px rgba(255, 20, 147, 0.4);
+        }
+        
+        .reset-btn:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(255, 20, 147, 0.6);
+        }
+        
+        button:active:not(:disabled) {
+            transform: translateY(-1px) scale(0.98);
+        }
+        
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+        
+        .laps-container {
+            margin-top: 40px;
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            padding-right: 10px;
+        }
+        
+        .laps-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .laps-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .laps-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #40e0d0, #ff1493);
+            border-radius: 10px;
+        }
+        
+        .laps-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #ff1493, #40e0d0);
+        }
+        
+        .laps-title {
+            font-size: 18px;
+            background: linear-gradient(135deg, #40e0d0, #ff1493);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .lap-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            background: transparent;
+            border-radius: 12px;
+            font-size: 18px;
+            border: none;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out backwards;
+        }
+        
+        .lap-item:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+        
+        .lap-item:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+        
+        .lap-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .lap-number {
+            font-weight: 700;
+            background: linear-gradient(135deg, #40e0d0, #9370db);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            min-width: 50px;
+        }
+        
+        .lap-time {
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #40e0d0;
+            text-shadow: 0 0 10px rgba(64, 224, 208, 0.5);
+        }
+        
+        .empty-laps {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 18px;
+            padding: 30px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="display">{{ displayTime }}</div>
+            <div class="controls">
+                <button 
+                    class="start-btn" 
+                    :disabled="isRunning"
+                    @click="start">
+                    <span>开始</span>
+                </button>
+                <button 
+                    class="pause-btn" 
+                    :disabled="!isRunning"
+                    @click="pause">
+                    <span>暂停</span>
+                </button>
+                <button 
+                    class="lap-btn" 
+                    :disabled="!isRunning"
+                    @click="recordLap">
+                    <span>记圈</span>
+                </button>
+                <button 
+                    class="reset-btn" 
+                    @click="reset">
+                    <span>重置</span>
+                </button>
+            </div>
+            <div class="laps-container">
+                <div class="laps-title" v-show="laps.length > 0">圈数记录</div>
+                <div class="empty-laps" v-show="laps.length === 0">暂无记录</div>
+                <div 
+                    v-for="lap in laps" 
+                    :key="lap.number" 
+                    class="lap-item">
+                    <span class="lap-number">第 {{ lap.number }} 圈</span>
+                    <span class="lap-time">{{ formatTime(lap.time) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    startTime: 0,
+                    elapsedTime: 0,
+                    timerInterval: null,
+                    isRunning: false,
+                    laps: [],
+                    lastLapTime: 0
+                };
+            },
+            computed: {
+                displayTime() {
+                    return this.formatTime(this.elapsedTime);
+                }
+            },
+            beforeUnmount() {
+                // 清理定时器
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                }
+            },
+            methods: {
+                // 格式化时间显示：MM:SS:mmm
+                formatTime(ms) {
+                    const totalSeconds = Math.floor(ms / 1000);
+                    const minutes = Math.floor(totalSeconds / 60);
+                    const seconds = totalSeconds % 60;
+                    const milliseconds = ms % 1000;
+                    
+                    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(3, '0')}`;
+                },
+                
+                // 更新显示
+                updateDisplay() {
+                    const currentTime = Date.now();
+                    this.elapsedTime = currentTime - this.startTime;
+                },
+                
+                // 开始计时
+                start() {
+                    if (!this.isRunning) {
+                        // 如果是从暂停状态恢复，startTime 需要调整
+                        if (this.elapsedTime > 0) {
+                            this.startTime = Date.now() - this.elapsedTime;
+                        } else {
+                            this.startTime = Date.now();
+                            this.lastLapTime = 0;
+                        }
+                        
+                        this.isRunning = true;
+                        this.timerInterval = setInterval(() => {
+                            this.updateDisplay();
+                        }, 10);
+                    }
+                },
+                
+                // 暂停计时
+                pause() {
+                    if (this.isRunning) {
+                        clearInterval(this.timerInterval);
+                        this.isRunning = false;
+                    }
+                },
+                
+                // 记圈
+                recordLap() {
+                    if (this.isRunning) {
+                        const currentTime = Date.now();
+                        const currentElapsed = currentTime - this.startTime;
+                        const lapTime = currentElapsed - this.lastLapTime;
+                        
+                        this.laps.unshift({
+                            number: this.laps.length + 1,
+                            time: lapTime,
+                            total: currentElapsed
+                        });
+                        
+                        this.lastLapTime = currentElapsed;
+                    }
+                },
+                
+                // 重置计时
+                reset() {
+                    clearInterval(this.timerInterval);
+                    this.isRunning = false;
+                    this.startTime = 0;
+                    this.elapsedTime = 0;
+                    this.lastLapTime = 0;
+                    this.laps = [];
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
+

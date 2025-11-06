@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>模拟简历布局</title>
+<link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="top">
+      <div class="avatar">
+        <img src="{{ url_for('static', filename='avatar.jpg') }}" alt="我的头像" onerror="this.onerror=null;this.src='/assets/logo.svg';" />
+      </div>
+      <div class="basic">
+        <div class="text-20 font-bold">姓名：王易宁</div>
+        <div class="small">年龄：17</div>
+        <div class="small">爱好：拍摄表情包</div>
+        <div class="small mt-14">城市：杭州 • 联系方式：不处</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">Brief</div>
+      <div class="brief">
+        一个喜欢拍摄自己表情包，认为自己很帅的高中生
+      </div>
+
+      <div class="experience">
+        <div class="title">Experiences</div>
+        <div class="line"><strong>2024 — 2025：</strong>学校乐队小小小副社长。</div>
+        <div class="line"><strong>2025：</strong>荣誉获得达尔文奖，为人类进化作出贡献</div>
+
+        <div class="mt-18 font-bold">Year to year: school</div>
+        <div class="line">2023 — 2025：杭州云谷学校</div>
+      </div>
+
+      <div class="skills">
+        <div class="title">Skills</div>
+        <div class="line"><strong>不知道写啥：</strong>有点实力但不多</div>
+        <div class="line"><strong>受着</strong>那就受着</div>
+        <div class="line"><strong>哈哈哈哈哈哈哈哈哈</strong>哈哈哈哈哈哈哈哈哈哈哈哈</div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+</body>
+</html>

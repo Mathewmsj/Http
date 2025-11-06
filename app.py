@@ -53,7 +53,7 @@ students = [
     {
         "id": 4,
         "name": "木桨",
-        "age": 17,
+        "age": 66,
         "major": "体育运动",
         "grade": "高中",
         "email": "mujiang@school.com"
@@ -76,8 +76,8 @@ def get_students():
 if __name__ == '__main__':
     print("=" * 50)
     print("Flask 服务器启动成功！")
-    print("访问地址: http://localhost:5000")
-    print("学生 API: http://localhost:5000/students")
+    print("访问地址: http://localhost:5001")
+    print("学生 API: http://localhost:5001/students")
     print("=" * 50)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5001)
 

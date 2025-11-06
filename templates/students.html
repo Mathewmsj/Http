@@ -3,388 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>学生列表 - AJAX Demo</title>
+    <title>学生列表</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: Arial, sans-serif;
+            margin: 20px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
         h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .subtitle {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 40px;
-            font-size: 1.1em;
-        }
-
-        #loading {
-            text-align: center;
-            color: white;
-            font-size: 1.5em;
-            padding: 40px;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        #students-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            padding: 20px 0;
-        }
-
-        .student-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .student-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        }
-
-        .student-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .student-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .student-name {
-            font-size: 1.5em;
-            font-weight: bold;
             color: #333;
         }
-
-        .student-id {
-            color: #999;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        .student-info {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .info-row {
-            display: flex;
-            align-items: center;
-            padding: 8px 0;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: #667eea;
-            min-width: 70px;
-            display: flex;
-            align-items: center;
-        }
-
-        .info-label::before {
-            content: '▸';
-            margin-right: 8px;
-            font-size: 1.2em;
-        }
-
-        .info-value {
-            color: #555;
-            flex: 1;
-        }
-
-        .grade-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 500;
-        }
-
-        #error-message {
-            background: #ff4444;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px 0;
-            display: none;
-        }
-
-        .stats {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-
-        .stats-content {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .stat-item {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-label {
+        #loading {
             color: #666;
-            margin-top: 5px;
+        }
+        .student {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎓 学生管理系统</h1>
-        <p class="subtitle">数据通过 AJAX 从后端动态加载</p>
-
-        <!-- 统计信息 -->
-        <div class="stats" id="stats" style="display: none;">
-            <div class="stats-content">
-                <div class="stat-item">
-                    <div class="stat-number" id="total-students">0</div>
-                    <div class="stat-label">学生总数</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="avg-age">0</div>
-                    <div class="stat-label">平均年龄</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="major-count">0</div>
-                    <div class="stat-label">专业数量</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 加载中提示 -->
-        <div id="loading">
-            <div class="spinner"></div>
-            <p>正在加载学生数据...</p>
-        </div>
-
-        <!-- 错误提示 -->
-        <div id="error-message"></div>
-
-        <!-- 学生列表容器（通过 JavaScript 动态创建） -->
-        <div id="students-container"></div>
-    </div>
+    <h1>学生列表</h1>
+    <p id="loading">正在加载数据...</p>
+    <div id="students-container"></div>
 
     <script>
-        // 页面加载完成后执行
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('页面加载完成，开始获取学生数据...');
-            loadStudents();
-        });
-
-        /**
-         * 从后端加载学生数据
-         */
-        function loadStudents() {
-            // 使用 Fetch API 发送 AJAX 请求
+        // 页面加载完成后，从后端获取数据
+        window.onload = function() {
+            console.log('开始加载学生数据...');
+            
+            // 使用 fetch API 发送 AJAX 请求
             fetch('/students')
-                .then(response => {
-                    console.log('收到响应:', response);
-                    
-                    // 检查响应是否成功
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    
-                    // 解析 JSON 数据
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('学生数据:', data);
+                    console.log('收到数据:', data);
                     
                     // 隐藏加载提示
                     document.getElementById('loading').style.display = 'none';
-                    
-                    // 显示并更新统计信息
-                    updateStats(data);
                     
                     // 渲染学生列表
                     renderStudents(data);
                 })
                 .catch(error => {
                     console.error('加载失败:', error);
-                    
-                    // 隐藏加载提示
-                    document.getElementById('loading').style.display = 'none';
-                    
-                    // 显示错误信息
-                    const errorDiv = document.getElementById('error-message');
-                    errorDiv.textContent = '❌ 加载学生数据失败: ' + error.message;
-                    errorDiv.style.display = 'block';
+                    document.getElementById('loading').textContent = '加载失败: ' + error;
                 });
-        }
+        };
 
-        /**
-         * 更新统计信息
-         */
-        function updateStats(students) {
-            // 显示统计区域
-            document.getElementById('stats').style.display = 'block';
-            
-            // 学生总数
-            document.getElementById('total-students').textContent = students.length;
-            
-            // 计算平均年龄
-            const avgAge = students.reduce((sum, s) => sum + s.age, 0) / students.length;
-            document.getElementById('avg-age').textContent = avgAge.toFixed(1);
-            
-            // 统计专业数量
-            const majors = new Set(students.map(s => s.major));
-            document.getElementById('major-count').textContent = majors.size;
-        }
-
-        /**
-         * 渲染学生列表
-         * @param {Array} students - 学生数据数组
-         */
+        // 渲染学生列表
         function renderStudents(students) {
             const container = document.getElementById('students-container');
             
-            // 清空容器
-            container.innerHTML = '';
-            
-            // 如果没有数据
-            if (!students || students.length === 0) {
-                container.innerHTML = '<p style="color: white; text-align: center;">暂无学生数据</p>';
-                return;
-            }
-            
-            // 遍历每个学生，创建卡片
-            students.forEach((student, index) => {
-                const card = createStudentCard(student, index);
-                container.appendChild(card);
+            // 遍历每个学生，动态创建 DOM
+            students.forEach(student => {
+                // 创建学生div
+                const div = document.createElement('div');
+                div.className = 'student';
+                
+                // 设置内容
+                div.innerHTML = 
+                    '<strong>姓名：</strong>' + student.name + '<br>' +
+                    '<strong>年龄：</strong>' + student.age + '<br>' +
+                    '<strong>专业：</strong>' + student.major + '<br>' +
+                    '<strong>年级：</strong>' + student.grade + '<br>' +
+                    '<strong>邮箱：</strong>' + student.email;
+                
+                // 添加到容器
+                container.appendChild(div);
             });
         }
-
-        /**
-         * 创建单个学生卡片
-         * @param {Object} student - 学生数据
-         * @param {number} index - 索引（用于延迟动画）
-         * @returns {HTMLElement} - 学生卡片元素
-         */
-        function createStudentCard(student, index) {
-            // 创建卡片容器
-            const card = document.createElement('div');
-            card.className = 'student-card';
-            card.style.animationDelay = `${index * 0.1}s`;
-            
-            // 创建卡片内容
-            card.innerHTML = `
-                <div class="student-header">
-                    <div class="student-avatar">${student.name.charAt(0)}</div>
-                    <div>
-                        <div class="student-name">${student.name}</div>
-                        <div class="student-id">ID: ${student.id}</div>
-                    </div>
-                </div>
-                <div class="student-info">
-                    <div class="info-row">
-                        <span class="info-label">年龄</span>
-                        <span class="info-value">${student.age} 岁</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">专业</span>
-                        <span class="info-value">${student.major}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">年级</span>
-                        <span class="info-value"><span class="grade-badge">${student.grade}</span></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">邮箱</span>
-                        <span class="info-value">${student.email}</span>
-                    </div>
-                </div>
-            `;
-            
-            return card;
-        }
-
-        // 可选：添加定时刷新功能（每30秒刷新一次）
-        // setInterval(loadStudents, 30000);
     </script>
 </body>
 </html>
-

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>简历</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="page">
+    <div class="top">
+      <div class="avatar">
+        {% set photo = profile.photo %}
+        {% if '://' in photo %}
+          <img src="{{ photo }}" alt="头像" />
+        {% elif photo == 'avatar.png' %}
+          <img src="{{ url_for('serve_avatar') }}" alt="头像" />
+        {% else %}
+          <img src="{{ url_for('static', filename=photo) }}" alt="头像" />
+        {% endif %}
+      </div>
+      <div class="basic">
+        <div class="text-20 font-bold">姓名：{{ profile.name }}</div>
+        <div class="small">年龄：{{ profile.age }}</div>
+        <div class="small">爱好：{{ profile.hobby }}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">Brief</div>
+      <div class="brief">{{ profile.brief }}</div>
+
+      <div class="experience">
+        <div class="title">Experiences</div>
+        {% for exp in profile.experiences %}
+          <div class="line"><strong>{{ exp.date }}：</strong>{{ exp.title }} — {{ exp.description }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+</body>
+</html>
+
+
+
